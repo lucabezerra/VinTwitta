@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home | VinTwitta - Your Twitter Monitor</title>
+</head>
+<body>
+{% include "./header.html" %}
+<p>Welcome, {{ name }}!</p>
+<form method="POST" action="{% url 'tweet_monitor:add_handle' %}">
+  {% csrf_token %}
+  <input type="text" name="handleName" placeholder="Write a Twitter handle here." />
+  <input type="submit" value="Fetch Tweets!" />
+</form>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>

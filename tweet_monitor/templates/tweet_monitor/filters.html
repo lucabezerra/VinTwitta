@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter Tweets | VinTwitta - Your Twitter Monitor</title>
+  <script type="text/javascript">
+    var hideAllFilters = function() {
+      var fields = document.getElementsByClassName("filterField");
+
+      for (var i = 0; i < fields.length; i++) {
+        fields[i].style.display = "none";
+      }
+    };
+
+    var changeFilter = function(type) {
+      hideAllFilters();
+      document.getElementsByName(type + "FilterDiv")[0].style.display = "block";
+    }
+  </script>
+</head>
+<body>
+{% include "./header.html" %}
+<p>Welcome, {{ name }}!</p>
+<form method="POST" action="{% url 'tweet_monitor:process_filter' %}">
+  {% csrf_token %}
+  <p>Filter by:</p>
+  <input type="radio" name="filterType" value="user" onchange="changeFilter('user')" /> User
+  <input type="radio" name="filterType" value="date" onchange="changeFilter('date')" /> Date
+  <input type="radio" name="filterType" value="text" onchange="changeFilter('text')" /> Text
+  <input type="radio" name="filterType" value="hashtag" onchange="changeFilter('hashtag')" /> Hashtag
+  <br/>
+  <div class="filterField" name="userFilterDiv" style="display:none" >Username: <input type="text" name="userFilter" /></div>
+  <div class="filterField" name="dateFilterDiv" style="display:none" >Date: <input type="text" name="dateFilter" /></div>
+  <div class="filterField" name="textFilterDiv" style="display:none" >Text: <input type="text" name="textFilter" /></div>
+  <div class="filterField" name="hashtagFilterDiv" style="display:none" >
+    Hashtag: <select name="hashtagFilter">
+              {% for hashtag in hashtags %}
+                <option name="{{hashtag.id}}" >{{hashtag.name}}</option>
+              {% endfor %}
+            </select>
+  </div>
+  <br/>
+  <input type="submit" value="FILTER!" />
+</form>
+<br />
+<select style="min-width:300px" name="filteredTweets" size="10">
+  {% for tweet in tweets %}
+    <option name="{{tweet.id}}">{{tweet.text}}</option>
+  {% endfor %}
+</select>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>
