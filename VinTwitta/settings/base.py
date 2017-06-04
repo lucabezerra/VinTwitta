@@ -137,17 +137,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 # Django Rest Framework
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
-}
+# REST_FRAMEWORK = {
+#     # Use Django's standard `django.contrib.auth` permissions,
+#     # or allow read-only access for unauthenticated users.
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#     ]
+# }
 
 # Twitter
-TWITTER_CONSUMER_KEY = "XIdVBdiKVSMj7NyoCO5xIzear"
-TWITTER_CONSUMER_SECRET = "UXD4Pd09cYA4pHZDoh7J6ZNdCF120gaPYkCDHcYdqPb4ccMRgM"
 SOCIAL_AUTH_TWITTER_KEY = "XIdVBdiKVSMj7NyoCO5xIzear"
 SOCIAL_AUTH_TWITTER_SECRET = "UXD4Pd09cYA4pHZDoh7J6ZNdCF120gaPYkCDHcYdqPb4ccMRgM"
 

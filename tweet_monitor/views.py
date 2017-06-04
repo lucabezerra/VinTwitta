@@ -7,6 +7,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from social_django.models import UserSocialAuth
 import tweepy
 from tweepy import TweepError
@@ -70,14 +72,52 @@ class HashtagTweetsView(generics.ListAPIView):
 
 
 # ########### Creation Endpoints ########### #
-class FetchTweetsView(generics.ListCreateAPIView):
+class FetchTweetsView(APIView):
     """ Fetches 200 most recent tweets from a specific user and stores them in the DB. """
-    model = Tweet
-    serializer_class = TweetSerializer
 
-    def get_queryset(self):
-        if self.kwargs.get('username'):
-            return Tweet.objects.filter(owner__iexact=self.kwargs.get('username'))
+    def post(self, request):
+        username = request.data.get('username')
+        if username:
+            response = _add_handle(request.data.get("user_id"), username)
+        else:
+            response = "Please provide a Twitter handle to have its tweets fetched."
+
+        return Response(response)
+
+
+def _add_handle(user_id, handle):
+
+    found = Tweet.objects.filter(owner__iexact=handle)
+    if found:
+        return_message = "The handle {} was already added to the database!".format(handle)
+    else:
+        user_obj = UserSocialAuth.objects.get(user_id=user_id)
+        tweepy_handler = generate_tweepy_handler(user_obj.extra_data['access_token']['oauth_token'],
+                                                 user_obj.extra_data['access_token']['oauth_token_secret'])
+
+        try:
+            statuses = tweepy_handler.user_timeline(screen_name=handle, count=200)
+            tweets_list = []
+
+            for status in statuses:
+                tweet = Tweet(provider_id=status.id, owner=status.user.screen_name, text=status.text,
+                              creation_date=status.created_at)
+                tweets_list.append(tweet)
+
+            Tweet.objects.bulk_create(tweets_list)
+
+            saved_tweets = Tweet.objects.filter(owner__iexact=handle)
+            for t in saved_tweets:
+                t.extract_hashtags()
+
+            return_message = "The handle {} was added!".format(handle)
+        except TweepError as err:
+            if err.response.status_code == 404:
+                return_message = "The provided Twitter handle doesn't exist. Please check the spelling."
+            else:
+                return_message = "There was a problem in the request, please check the handle spelling and try again."
+
+    return return_message
 
 
 @login_required
