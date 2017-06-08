@@ -30,6 +30,7 @@ class AddHandle extends React.Component {
         <p>Write a Twitter handle below to fetch its tweets.</p>
         <form method="POST" action="/tweets/process_add_handle/">
           <DjangoCSRFToken />
+          <input type="hidden" name="user_id" value="1" />
           <input type="text" name="handleName" />
           <input type="submit" value="Fetch Tweets!" />
         </form>
@@ -54,8 +55,13 @@ class FilterType extends React.Component {
   }
 
   render() {
+    var divStyle = {
+      margin: '5px',
+      marginLeft: '10px',
+    };
+
     return (
-      <input type="radio" name="filterType" value={this.props.value} onChange={this.change.bind(this)} />
+      <input type="radio" name="filterType" style={divStyle} value={this.props.value} onChange={this.change.bind(this)} />
     );
   }
 }
@@ -81,13 +87,30 @@ class FilterField extends React.Component {
   }
 }
 
- class FilterTweets extends React.Component {
+class FilterTweets extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+    }
+  }
+
+  selectChange(event){
+     this.setState({value: event.target.value});
+  }
+
+  filterChange() {
+    if (this.props.filterName == "userFilter") {
+
+    }
+  }
+
   render() {
     return (
       <div>
         <p>Welcome, USER!</p>
         <p>Select a filter type and enter the corresponding filter data below.</p>
-        <form method="POST" action="{% url 'tweet_monitor:process_filter' %}">
+        <form method="POST" action="filters/user/lucabezerra_">
           <DjangoCSRFToken />
           <p>Filter by:</p>
           <FilterType value="user" /> User
@@ -103,10 +126,19 @@ class FilterField extends React.Component {
           <input type="submit" value="FILTER!" />
         </form>
         <br />
-        <select name="filteredTweets" size="10">
+        <h3>Tweets Filtered:</h3>
+        <select name="filteredTweets" style={{ minWidth: "20%" }} size="10">
             <option name="tweet.id">tweet.text</option>
         </select>
       </div>
+    );
+  }
+}
+
+class FilterByUser extends React.Component {
+  render() {
+    return (
+      <FilterTweets filterType="Username"
     );
   }
 }
@@ -120,7 +152,7 @@ class App extends React.Component {
         <ul className="header">
           <li><Link activeClassName="active" to="/tweets">Home</Link></li>
           <li><Link activeClassName="active" to="/tweets/addHandle">Add Twitter Handle</Link></li>
-          <li><Link activeClassName="active" to="/tweets/filters">Filter Stored Tweets</Link></li>
+          <li><Link activeClassName="active" to="/tweets/filters_user">Filter by Username</Link></li>
         </ul>
         <div className="content">
           {this.props.children}

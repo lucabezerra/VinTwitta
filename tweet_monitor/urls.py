@@ -9,13 +9,13 @@ urlpatterns = [
     # React view
     url(r'^process_add_handle/$', views.add_handle, name='add_handle'),
     url(r'^$', TemplateView.as_view(template_name='tweet_monitor/react_index.html'), name='index'),
-    url(r'^.*/', TemplateView.as_view(template_name="tweet_monitor/react_index.html"), name='react_base'),
+
 
     # Pure Django views
     url(r'^index/$', views.index, name='index2'),  # TODO: EDIT BACK
     url(r'^list/$', views.TweetsView.as_view(), name='tweets_list'),
     # url(r'^add_handle/$', views.add_handle, name='add_handle'),
-    url(r'^filters/$', views.filters, name='filters'),
+    # url(r'^filters/$', views.filters, name='filters'),
     url(r'^process_filter/$', views.process_filter, name='process_filter'),
 
     # DRF views
@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^filters/hashtag/(?P<hashtag>\S+)$/', views.HashtagTweetsView.as_view(), name='tweets_by_hashtag'),
 
     url(r'^fetch/$', views.FetchTweetsView.as_view(), name='fetch_tweets'),
+
+    url(r'^.*/', TemplateView.as_view(template_name="tweet_monitor/react_index.html"), name='react_base'),
 ]
