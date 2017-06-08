@@ -24,6 +24,11 @@ urlpatterns = [
     url(r'^filters/text/(?P<text>\S+)/$', views.TextTweetsView.as_view(), name='tweets_by_text'),
     url(r'^filters/hashtag/(?P<hashtag>\S+)$/', views.HashtagTweetsView.as_view(), name='tweets_by_hashtag'),
 
+    # url(r'^filters/user/(?P<username>\S+)/$', views.UserTweetsView.as_view(), name='tweets_by_username'),
+    # url(r'^filters/date/(?P<date>\S+)/$', views.DateRangeTweetsView.as_view(), name='tweets_by_date'),
+    # url(r'^filters/text/(?P<text>\S+)/$', views.TextTweetsView.as_view(), name='tweets_by_text'),
+    # url(r'^filters/hashtag/(?P<hashtag>\S+)$/', views.HashtagTweetsView.as_view(), name='tweets_by_hashtag'),
+
     url(r'^fetch/$', views.FetchTweetsView.as_view(), name='fetch_tweets'),
 
     url(r'^.*/', TemplateView.as_view(template_name="tweet_monitor/react_index.html"), name='react_base'),

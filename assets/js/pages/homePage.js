@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory, Link } from 'react-router';
 import HomePageContainer from '../containers/HomePageContainer';
 import DjangoCSRFToken from 'django-react-csrftoken';
+import axios from 'axios';
 
 
 class Home extends React.Component {
@@ -80,8 +81,21 @@ class FilterField extends React.Component {
 
   render() {
     return (
-      <div name={this.props.divName} style={{display: this.state.shouldDisplay ? 'block' : 'none' }} >
+      <div name={this.props.divName} >
         {this.props.displayValue}: <input type={this.props.inputType} name={this.props.filterName} />
+      </div>
+    );
+  }
+}
+
+class FilterResults extends React.Component {
+  render() {
+    return (
+      <div>
+        <h3>Tweets Filtered:</h3>
+        <select name="filteredTweets" style={{ minWidth: "20%" }} size="10">
+            <option name="tweet.id">tweet.text</option>
+        </select>
       </div>
     );
   }
@@ -113,10 +127,6 @@ class FilterTweets extends React.Component {
         <form method="POST" action="filters/user/lucabezerra_">
           <DjangoCSRFToken />
           <p>Filter by:</p>
-          <FilterType value="user" /> User
-          <FilterType value="date" /> Date
-          <FilterType value="text" /> Text
-          <FilterType value="hashtag" /> Hashtag
           <br />
           <FilterField divName="userFilterDiv" displayValue="Username" inputType="text" filterName="userFilter" />
           <FilterField divName="dateFilterDiv" displayValue="Date" inputType="text" filterName="dateFilter" />
@@ -136,9 +146,41 @@ class FilterTweets extends React.Component {
 }
 
 class FilterByUser extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      username: "",
+    };
+  }
+
+  fetchData() {
+    axios.get('/tweets/filters/user/' + this.state.username + '/')
+      .then(function (response) {
+        console.log("Response", response);
+      })
+      .catch(function (error) {
+        console.log("Error:", error);
+    });
+  }
+
+  storeUsername(evt) {
+    this.setState({
+      username: evt.target.value
+    });
+  }
+
   render() {
     return (
-      <FilterTweets filterType="Username"
+      <div>
+        <p>Filter by Username - Type the username below:</p>
+        <br />
+        Username: <input type="text" name="userFilter" onBlur={(evt) => this.storeUsername(evt)} />
+        <br />
+        <input type="button" onClick={() => this.fetchData()} value="FILTER!" />
+        <br />
+        <FilterResults />
+      </div>
     );
   }
 }
@@ -168,7 +210,7 @@ ReactDOM.render(
     <Route path="/tweets" component={App}>
       <IndexRoute component={Home} />
       <Route path="addHandle" component={AddHandle} />
-      <Route path="filters" component={FilterTweets} />
+      <Route path="filters_user" component={FilterByUser} />
     </Route>
   </Router>,
   document.getElementById('react-app')
