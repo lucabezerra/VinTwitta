@@ -1,14 +1,20 @@
 from django.conf.urls import url
+from django.views.generic import TemplateView
 
 from . import views
 
 app_name = "tweet_monitor"
 
 urlpatterns = [
+    # React view
+    url(r'^process_add_handle/$', views.add_handle, name='add_handle'),
+    url(r'^$', TemplateView.as_view(template_name='tweet_monitor/react_index.html'), name='index'),
+    url(r'^.*/', TemplateView.as_view(template_name="tweet_monitor/react_index.html"), name='react_base'),
+
     # Pure Django views
-    url(r'^$', views.index, name='index'),
+    url(r'^index/$', views.index, name='index2'),  # TODO: EDIT BACK
     url(r'^list/$', views.TweetsView.as_view(), name='tweets_list'),
-    url(r'^add_handle/$', views.add_handle, name='add_handle'),
+    # url(r'^add_handle/$', views.add_handle, name='add_handle'),
     url(r'^filters/$', views.filters, name='filters'),
     url(r'^process_filter/$', views.process_filter, name='process_filter'),
 

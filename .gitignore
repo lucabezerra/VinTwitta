@@ -19,6 +19,7 @@ __pycache__/
 # npm
 node_modules/
 npm-debug.log
+package-lock.json
 
 #Folders
 .DS_Store

@@ -3,10 +3,11 @@
 
 
 {% block body %}
-<h1>it works! (Django Template)</h1>
+<div style="margin:10px;">
+  <h1>Welcome to VinTwitta! (Django Template)</h1>
+  <h2>Click the link below to Login with Twitter and access the system:</h2>
 
+  <a href="{% url 'social:begin' 'twitter' %}">Login with Twitter</a>
+</div>
 
-<a href="{% url 'social:begin' 'twitter' %}">Login with Twitter</a>
-
-<div id="react-app"></div>
 {% endblock %}
