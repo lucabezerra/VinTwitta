@@ -8,6 +8,13 @@ import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
+/***
+  TODO: Refactor "Filter" components in order to have a single one that receives parameters and returns a component
+  for each type of filter, instead of having 4 almost identical blocks of code.
+  Requires a bit more React knowledge.
+***/
+
+
 class Home extends React.Component {
   render() {
     return (

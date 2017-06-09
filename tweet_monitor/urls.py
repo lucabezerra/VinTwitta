@@ -20,7 +20,7 @@ urlpatterns = [
 
     # DRF views
     url(r'^filters/user/(?P<username>\S+)/$', views.UserTweetsView.as_view(), name='tweets_by_username'),
-    url(r'^filters/date/(?P<date>\S+)/$', views.DateRangeTweetsView.as_view(), name='tweets_by_date'),
+    url(r'^filters/date/(?P<date>.+)/$', views.DateRangeTweetsView.as_view(), name='tweets_by_date'),
     url(r'^filters/text/(?P<text>\S+)/$', views.TextTweetsView.as_view(), name='tweets_by_text'),
     url(r'^filters/hashtag/(?P<hashtag>\S+)/$', views.HashtagTweetsView.as_view(), name='tweets_by_hashtag'),
     url(r'^list_hashtags/$', views.HashtagsView.as_view(), name='hashtags_list'),

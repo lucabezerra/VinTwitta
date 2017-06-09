@@ -22,8 +22,6 @@ ADMINS = (
     ('Admin', 'lucabezerra@gmail.com'),
 )
 
-# AUTH_USER_MODEL = 'users.User'
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -39,7 +37,6 @@ INSTALLED_APPS = [
     'social_django',
 
     'common',
-    # 'users',
     'tweet_monitor',
 
     'rest_framework',
