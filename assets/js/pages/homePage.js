@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory, Link } from 'react-router';
-import DjangoCSRFToken from 'django-react-csrftoken';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -32,7 +31,7 @@ class AddHandle extends React.Component {
       <div>
         <p>Write a Twitter handle below to fetch its tweets.</p>
         <form method="POST" action="/tweets/process_add_handle/">
-          <DjangoCSRFToken />
+          <input type="hidden" name="csrfmiddlewaretoken" value={ localStorage.getItem("csrftoken") } />
           <input type="hidden" name="user_id" value="1" />
           <input type="text" name="handleName" />
           <input type="submit" value="Fetch Tweets!" style={{ margin: "5px"}} />
