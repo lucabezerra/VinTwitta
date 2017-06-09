@@ -14,7 +14,7 @@ import tweepy
 from tweepy import TweepError
 
 from .models import Tweet, Hashtag
-from .serializers import TweetSerializer
+from .serializers import TweetSerializer, HashtagSerializer
 
 
 # ########### Retrieval Endpoints ########### #
@@ -57,6 +57,15 @@ class TextTweetsView(generics.ListAPIView):
     def get_queryset(self):
         if self.kwargs.get('text'):
             return Tweet.objects.filter(text__icontains=self.kwargs.get('text'))
+
+
+class HashtagsView(generics.ListAPIView):
+    """ Returns a list of all hashtags. """
+    model = Hashtag
+    serializer_class = HashtagSerializer
+
+    def get_queryset(self):
+        return Hashtag.objects.all()
 
 
 class HashtagTweetsView(generics.ListAPIView):

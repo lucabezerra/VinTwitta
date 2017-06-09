@@ -4,6 +4,10 @@ import { Router, Route, IndexRoute, browserHistory, Link } from 'react-router';
 import HomePageContainer from '../containers/HomePageContainer';
 import DjangoCSRFToken from 'django-react-csrftoken';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 class Home extends React.Component {
@@ -14,8 +18,8 @@ class Home extends React.Component {
         <p>This is a Django + React SPA (Single Page Application) that allows you to type any Twitter handle and
         fetch its 200 latest tweets, which will be stored in the database - click on <Link to="/tweets/addHandle">Add
         Twitter Handle</Link> to do it.</p>
-        <p>After storing it, click on <Link to="/tweets/filters">Filter Stored Tweets</Link> to filter the tweets that
-        are already on the database either by Twitter handle, date, text or hashtags.</p>
+        <p>After storing it, click on the different filter options above to filter the tweets that are already on the
+        database either by Twitter handle, date, text or hashtags.</p>
         <h3>Enjoy!</h3>
       </div>
     );
@@ -27,123 +31,37 @@ class AddHandle extends React.Component {
   render() {
     return (
       <div>
-        <p>Welcome, USER!</p>
         <p>Write a Twitter handle below to fetch its tweets.</p>
         <form method="POST" action="/tweets/process_add_handle/">
           <DjangoCSRFToken />
           <input type="hidden" name="user_id" value="1" />
           <input type="text" name="handleName" />
-          <input type="submit" value="Fetch Tweets!" />
+          <input type="submit" value="Fetch Tweets!" style={{ margin: "5px"}} />
         </form>
       </div>
     );
   }
 }
 
-class FilterType extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      value: null,
-    };
-  }
-
-  change(event){
-    this.setState({value: event.target.value});
-    console.log("Event:", event.target.value);
-    console.log("State:", this.state);
-    console.log("Value:", this.state.value);
-  }
-
-  render() {
-    var divStyle = {
-      margin: '5px',
-      marginLeft: '10px',
-    };
-
-    return (
-      <input type="radio" name="filterType" style={divStyle} value={this.props.value} onChange={this.change.bind(this)} />
-    );
-  }
+function FilterResults(props) {
+  return (
+    <div>
+      <h3>Tweets Filtered:</h3>
+      <select name="filteredTweets" style={{ minWidth: "20%", maxWidth: "95%" }} size="10">
+        {
+          props.results.data ?
+          props.results.data.map(function(result) {
+            return <option key={result.provider_id} value={result.provider_id} style={{ padding: "6px" }}>
+              @{result.owner} said: {result.text}
+            </option>;
+          }) :
+          console.log()
+        }
+      </select>
+    </div>
+  );
 }
 
-class FilterField extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      shouldDisplay: false,
-    };
-  }
-
-  toggleDisplay(props) {
-    this.setState({shouldDisplay: props.show});
-  }
-
-  render() {
-    return (
-      <div name={this.props.divName} >
-        {this.props.displayValue}: <input type={this.props.inputType} name={this.props.filterName} />
-      </div>
-    );
-  }
-}
-
-class FilterResults extends React.Component {
-  render() {
-    return (
-      <div>
-        <h3>Tweets Filtered:</h3>
-        <select name="filteredTweets" style={{ minWidth: "20%" }} size="10">
-            <option name="tweet.id">tweet.text</option>
-        </select>
-      </div>
-    );
-  }
-}
-
-class FilterTweets extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-    }
-  }
-
-  selectChange(event){
-     this.setState({value: event.target.value});
-  }
-
-  filterChange() {
-    if (this.props.filterName == "userFilter") {
-
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <p>Welcome, USER!</p>
-        <p>Select a filter type and enter the corresponding filter data below.</p>
-        <form method="POST" action="filters/user/lucabezerra_">
-          <DjangoCSRFToken />
-          <p>Filter by:</p>
-          <br />
-          <FilterField divName="userFilterDiv" displayValue="Username" inputType="text" filterName="userFilter" />
-          <FilterField divName="dateFilterDiv" displayValue="Date" inputType="text" filterName="dateFilter" />
-          <FilterField divName="textFilterDiv" displayValue="Text" inputType="text" filterName="textFilter" />
-          <FilterField divName="hashtagFilterDiv" displayValue="Hashtag" inputType="text" filterName="hashtagFilter" />
-          <br />
-          <input type="submit" value="FILTER!" />
-        </form>
-        <br />
-        <h3>Tweets Filtered:</h3>
-        <select name="filteredTweets" style={{ minWidth: "20%" }} size="10">
-            <option name="tweet.id">tweet.text</option>
-        </select>
-      </div>
-    );
-  }
-}
 
 class FilterByUser extends React.Component {
   constructor() {
@@ -151,23 +69,31 @@ class FilterByUser extends React.Component {
 
     this.state = {
       username: "",
+      results: [],
     };
   }
 
   fetchData() {
-    axios.get('/tweets/filters/user/' + this.state.username + '/')
-      .then(function (response) {
-        console.log("Response", response);
-      })
-      .catch(function (error) {
-        console.log("Error:", error);
-    });
+    var username = this.state.username.trim();
+    var results = [];
+    self = this;
+    if (username != "" && username.length > 0) {
+      axios.get('/tweets/filters/user/' + username + '/')
+        .then(function (response) {
+          self.setState({results: response})
+        })
+        .catch(function (error) {
+          console.log("Error:", error);
+      });
+    }
+  }
+
+  storeResults(results) {
+    this.setState({ results: results });
   }
 
   storeUsername(evt) {
-    this.setState({
-      username: evt.target.value
-    });
+    this.setState({ username: evt.target.value });
   }
 
   render() {
@@ -175,11 +101,185 @@ class FilterByUser extends React.Component {
       <div>
         <p>Filter by Username - Type the username below:</p>
         <br />
-        Username: <input type="text" name="userFilter" onBlur={(evt) => this.storeUsername(evt)} />
+        <a style={{ fontWeight: "bold" }}>Username:</a> <input type="text" onBlur={(evt) => this.storeUsername(evt)} />
+        <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
+        <br /> <br />
+        <FilterResults results={this.state.results}/>
+      </div>
+    );
+  }
+}
+
+class FilterByDate extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      date: moment(),
+      results: [],
+    };
+
+    this.handleDateChange = this.handleDateChange.bind(this);
+  }
+
+  fetchData() {
+    var date = this.state.date.format().trim();
+    var results = [];
+    self = this;
+    if (date != "" && date.length > 0) {
+      axios.get('/tweets/filters/date/' + date + '/')
+        .then(function (response) {
+          self.setState({results: response})
+        })
+        .catch(function (error) {
+          console.log("Error:", error);
+      });
+    }
+  }
+
+  storeResults(results) {
+    this.setState({ results: results });
+  }
+
+  storeDate(evt) {
+    this.setState({ date: evt.target.value });
+  }
+
+  handleDateChange(date) {
+    this.setState({ date: date });
+  }
+
+
+  render() {
+    return (
+      <div>
+        <p>Filter by Date - Pick the date below:</p>
         <br />
-        <input type="button" onClick={() => this.fetchData()} value="FILTER!" />
+        <a style={{ fontWeight: "bold", marginRight: "5px" }}>Date:</a>
+        <DatePicker selected={this.state.date} onChange={this.handleDateChange} />
+        <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
+        <br /> <br />
+        <FilterResults results={this.state.results}/>
+      </div>
+    );
+  }
+}
+
+class FilterByText extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      text: "",
+      results: [],
+    };
+  }
+
+  fetchData() {
+    var text = this.state.text.trim();
+    var results = [];
+    self = this;
+    if (text != "" && text.length > 0) {
+      axios.get('/tweets/filters/text/' + text + '/')
+        .then(function (response) {
+          self.setState({results: response})
+        })
+        .catch(function (error) {
+          console.log("Error:", error);
+      });
+    }
+  }
+
+  storeResults(results) {
+    this.setState({ results: results });
+  }
+
+  storeText(evt) {
+    this.setState({ text: evt.target.value });
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Filter by Text - Type the text below:</p>
         <br />
-        <FilterResults />
+        <a style={{ fontWeight: "bold" }}>Text:</a> <input type="text" onBlur={(evt) => this.storeText(evt)} />
+        <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
+        <br /> <br />
+        <FilterResults results={this.state.results}/>
+      </div>
+    );
+  }
+}
+
+class FilterByHashtag extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      hashtagList: [],
+      hashtag: "",
+      results: [],
+    };
+  }
+
+  fetchData() {
+    var hashtag = this.state.hashtag.trim();
+    var results = [];
+    self = this;
+    if (hashtag != "" && hashtag.length > 0 && hashtag != "---") {
+      hashtag = hashtag.replace("#", "");
+      axios.get('/tweets/filters/hashtag/' + hashtag + '/')
+        .then(function (response) {
+          self.setState({results: response})
+        })
+        .catch(function (error) {
+          console.log("Error:", error);
+      });
+    }
+  }
+
+  storeResults(results) {
+    this.setState({ results: results });
+  }
+
+  storeHashtag(evt) {
+    this.setState({ hashtag: evt.target.value });
+  }
+
+  componentDidMount() {
+    self = this;
+    axios.get('/tweets/list_hashtags/')
+      .then(function (response) {
+        self.setState({hashtagList: response})
+      })
+      .catch(function (error) {
+        console.log("Error:", error);
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Filter by Hashtag - Pick the hashtag below:</p>
+        <br />
+        <a style={{ fontWeight: "bold", marginRight: "5px" }}>Hashtag:</a>
+
+        <select onChange={(evt) => this.storeHashtag(evt)}>
+          <option value="">---</option>
+          {
+            this.state.hashtagList.data ?
+            this.state.hashtagList.data.map(function(hashtag, i) {
+              return <option key={i}
+                value={hashtag.name}>{hashtag.name}</option>;
+            }) :
+            console.log()
+          }
+        </select>
+
+        <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
+        <br /> <br />
+        <FilterResults results={this.state.results}/>
       </div>
     );
   }
@@ -195,6 +295,9 @@ class App extends React.Component {
           <li><Link activeClassName="active" to="/tweets">Home</Link></li>
           <li><Link activeClassName="active" to="/tweets/addHandle">Add Twitter Handle</Link></li>
           <li><Link activeClassName="active" to="/tweets/filters_user">Filter by Username</Link></li>
+          <li><Link activeClassName="active" to="/tweets/filters_date">Filter by Date</Link></li>
+          <li><Link activeClassName="active" to="/tweets/filters_text">Filter by Text</Link></li>
+          <li><Link activeClassName="active" to="/tweets/filters_hashtag">Filter by Hashtag</Link></li>
         </ul>
         <div className="content">
           {this.props.children}
@@ -211,6 +314,9 @@ ReactDOM.render(
       <IndexRoute component={Home} />
       <Route path="addHandle" component={AddHandle} />
       <Route path="filters_user" component={FilterByUser} />
+      <Route path="filters_date" component={FilterByDate} />
+      <Route path="filters_text" component={FilterByText} />
+      <Route path="filters_hashtag" component={FilterByHashtag} />
     </Route>
   </Router>,
   document.getElementById('react-app')
