@@ -129,6 +129,26 @@ def _add_handle(user_id, handle):
     return return_message
 
 
+def generate_tweepy_handler(user_access_token, user_access_token_secret):
+    """
+    Generate handler object to use Tweepy's methods.
+    :param user_access_token: The access token obtained from the signin process.
+    :param user_access_token_secret: The access token secret.
+    :return: The API handler.
+    """
+    consumer_key = settings.SOCIAL_AUTH_TWITTER_KEY
+    consumer_secret = settings.SOCIAL_AUTH_TWITTER_SECRET
+    access_key = user_access_token
+    access_secret = user_access_token_secret
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    handler = tweepy.API(auth)
+
+    return handler
+
+
+# ################### FOR TESTING PURPOSES ONLY ################### #
+
 @login_required
 def index(request):
     print("Logged in user:", request.user)
@@ -212,22 +232,3 @@ def process_filter(request):
     hashtags = Hashtag.objects.all()
     return render(request, "tweet_monitor/filters.html", {"name": request.user.first_name, "hashtags": hashtags,
                                                           "tweets": tweets})
-    # return HttpResponseRedirect(reverse("tweet_monitor:filters"))
-
-
-def generate_tweepy_handler(user_access_token, user_access_token_secret):
-    """
-    Generate handler object to use Tweepy's methods.
-    :param user_access_token: The access token obtained from the signin process.
-    :param user_access_token_secret: The access token secret.
-    :return: The API handler.
-    """
-    consumer_key = settings.SOCIAL_AUTH_TWITTER_KEY
-    consumer_secret = settings.SOCIAL_AUTH_TWITTER_SECRET
-    access_key = user_access_token
-    access_secret = user_access_token_secret
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_key, access_secret)
-    handler = tweepy.API(auth)
-
-    return handler

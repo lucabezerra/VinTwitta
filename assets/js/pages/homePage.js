@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory, Link } from 'react-router';
-import HomePageContainer from '../containers/HomePageContainer';
 import DjangoCSRFToken from 'django-react-csrftoken';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
@@ -70,6 +69,7 @@ class FilterByUser extends React.Component {
     this.state = {
       username: "",
       results: [],
+      error: "",
     };
   }
 
@@ -80,10 +80,15 @@ class FilterByUser extends React.Component {
     if (username != "" && username.length > 0) {
       axios.get('/tweets/filters/user/' + username + '/')
         .then(function (response) {
-          self.setState({results: response})
+          if (response.data && response.data.length > 0) {
+            self.setState({results: response});
+          } else {
+            self.setState({error: "No tweets were found with this filtering criteria."});
+          }
         })
         .catch(function (error) {
-          console.log("Error:", error);
+          console.log(error);
+          self.setState({error: "There was an error during the request. Please check the data and try again."});
       });
     }
   }
@@ -103,7 +108,13 @@ class FilterByUser extends React.Component {
         <br />
         <a style={{ fontWeight: "bold" }}>Username:</a> <input type="text" onBlur={(evt) => this.storeUsername(evt)} />
         <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
-        <br /> <br />
+        <br />
+        {
+          this.state.error ?
+          <p style={{ color: "red", fontWeight: "bold" }}>{ this.state.error }</p> :
+          <a></a>
+        }
+        <br />
         <FilterResults results={this.state.results}/>
       </div>
     );
@@ -117,6 +128,7 @@ class FilterByDate extends React.Component {
     this.state = {
       date: moment(),
       results: [],
+      error: "",
     };
 
     this.handleDateChange = this.handleDateChange.bind(this);
@@ -129,10 +141,15 @@ class FilterByDate extends React.Component {
     if (date != "" && date.length > 0) {
       axios.get('/tweets/filters/date/' + date + '/')
         .then(function (response) {
-          self.setState({results: response})
+          if (response.data && response.data.length > 0) {
+            self.setState({results: response});
+          } else {
+            self.setState({error: "No tweets were found with this filtering criteria."});
+          }
         })
         .catch(function (error) {
-          console.log("Error:", error);
+          console.log(error);
+          self.setState({error: "There was an error during the request. Please check the data and try again."});
       });
     }
   }
@@ -149,7 +166,6 @@ class FilterByDate extends React.Component {
     this.setState({ date: date });
   }
 
-
   render() {
     return (
       <div>
@@ -158,7 +174,13 @@ class FilterByDate extends React.Component {
         <a style={{ fontWeight: "bold", marginRight: "5px" }}>Date:</a>
         <DatePicker selected={this.state.date} onChange={this.handleDateChange} />
         <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
-        <br /> <br />
+        <br />
+        {
+          this.state.error ?
+          <p style={{ color: "red", fontWeight: "bold" }}>{ this.state.error }</p> :
+          <a></a>
+        }
+        <br />
         <FilterResults results={this.state.results}/>
       </div>
     );
@@ -172,6 +194,7 @@ class FilterByText extends React.Component {
     this.state = {
       text: "",
       results: [],
+      error: "",
     };
   }
 
@@ -182,10 +205,15 @@ class FilterByText extends React.Component {
     if (text != "" && text.length > 0) {
       axios.get('/tweets/filters/text/' + text + '/')
         .then(function (response) {
-          self.setState({results: response})
+          if (response.data && response.data.length > 0) {
+            self.setState({results: response});
+          } else {
+            self.setState({error: "No tweets were found with this filtering criteria."});
+          }
         })
         .catch(function (error) {
-          console.log("Error:", error);
+          console.log(error);
+          self.setState({error: "There was an error during the request. Please check the data and try again."});
       });
     }
   }
@@ -205,7 +233,13 @@ class FilterByText extends React.Component {
         <br />
         <a style={{ fontWeight: "bold" }}>Text:</a> <input type="text" onBlur={(evt) => this.storeText(evt)} />
         <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
-        <br /> <br />
+        <br />
+        {
+          this.state.error ?
+          <p style={{ color: "red", fontWeight: "bold" }}>{ this.state.error }</p> :
+          <a></a>
+        }
+        <br />
         <FilterResults results={this.state.results}/>
       </div>
     );
@@ -220,6 +254,7 @@ class FilterByHashtag extends React.Component {
       hashtagList: [],
       hashtag: "",
       results: [],
+      error: "",
     };
   }
 
@@ -231,10 +266,15 @@ class FilterByHashtag extends React.Component {
       hashtag = hashtag.replace("#", "");
       axios.get('/tweets/filters/hashtag/' + hashtag + '/')
         .then(function (response) {
-          self.setState({results: response})
+          if (response.data && response.data.length > 0) {
+            self.setState({results: response});
+          } else {
+            self.setState({error: "No tweets were found with this filtering criteria."});
+          }
         })
         .catch(function (error) {
-          console.log("Error:", error);
+          console.log(error);
+          self.setState({error: "There was an error during the request. Please check the data and try again."});
       });
     }
   }
@@ -251,10 +291,15 @@ class FilterByHashtag extends React.Component {
     self = this;
     axios.get('/tweets/list_hashtags/')
       .then(function (response) {
-        self.setState({hashtagList: response})
+        if (response.data && response.data.length > 0) {
+          self.setState({hashtagList: response})
+        } else {
+          self.setState({error: "No hashtags were found, please add more tweets to the database."});
+        }
       })
       .catch(function (error) {
-        console.log("Error:", error);
+        console.log(error);
+        self.setState({error: "There was an error during the request. Please reload the page."});
     });
   }
 
@@ -278,7 +323,13 @@ class FilterByHashtag extends React.Component {
         </select>
 
         <input type="button" onClick={() => this.fetchData()} value="FILTER!" style={{ margin: "5px" }}/>
-        <br /> <br />
+        <br />
+        {
+          this.state.error ?
+          <p style={{ color: "red", fontWeight: "bold" }}>{ this.state.error }</p> :
+          <a></a>
+        }
+        <br />
         <FilterResults results={this.state.results}/>
       </div>
     );
