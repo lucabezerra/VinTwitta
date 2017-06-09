@@ -197,7 +197,7 @@ def add_handle(request):
                     for t in saved_tweets:
                         t.extract_hashtags()
 
-                    messages.success(request, "{}' were added successfully!".format(handle))
+                    messages.success(request, "@{}'s tweets were added successfully!".format(handle))
                 except TweepError as err:
                     print(":::: ERROR:", err, err.response.status_code)
                     if err.response.status_code == 404:
