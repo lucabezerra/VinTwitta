@@ -344,7 +344,7 @@ class App extends React.Component {
         <h1>VinTwitta</h1>
         <ul className="header">
           <li><Link activeClassName="active" to="/tweets">Home</Link></li>
-          <li><Link activeClassName="active" to="/tweets/addHandle">Add Twitter Handle</Link></li>
+          <li><Link activeClassName="active" to="/tweets/add_handle">Add Twitter Handle</Link></li>
           <li><Link activeClassName="active" to="/tweets/filters_user">Filter by Username</Link></li>
           <li><Link activeClassName="active" to="/tweets/filters_date">Filter by Date</Link></li>
           <li><Link activeClassName="active" to="/tweets/filters_text">Filter by Text</Link></li>
@@ -363,7 +363,7 @@ ReactDOM.render(
     <Route path="/" component={App}></Route>
     <Route path="/tweets" component={App}>
       <IndexRoute component={Home} />
-      <Route path="addHandle" component={AddHandle} />
+      <Route path="add_handle" component={AddHandle} />
       <Route path="filters_user" component={FilterByUser} />
       <Route path="filters_date" component={FilterByDate} />
       <Route path="filters_text" component={FilterByText} />

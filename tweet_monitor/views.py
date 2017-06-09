@@ -1,3 +1,6 @@
+import json
+
+from decouple import config
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -147,13 +150,17 @@ def generate_tweepy_handler(user_access_token, user_access_token_secret):
     return handler
 
 
-# ################### FOR TESTING PURPOSES ONLY ################### #
-
 @login_required
 def index(request):
-    print("Logged in user:", request.user)
+    payload = {
+        "name": request.user.first_name,
+        "local_storage": {
+            "sessionid": request.COOKIES.get("sessionid"),
+            "csrftoken": request.COOKIES.get("csrftoken")
+        }
+    }
 
-    return render(request, "tweet_monitor/index.html", {"name": request.user.first_name})
+    return render(request, "tweet_monitor/react_index.html", payload)
 
 
 @login_required
@@ -169,7 +176,7 @@ def add_handle(request):
         if handle:
             found = Tweet.objects.filter(owner__iexact=handle)
             if found:
-                messages.error(request, "The handle {} was already added to the database!".format(handle))
+                messages.warning(request, "{}' tweets were already in the database!".format(handle))
             else:
                 user_obj = UserSocialAuth.objects.get(user_id=request.user.id)
                 tweepy_handler = generate_tweepy_handler(user_obj.extra_data['access_token']['oauth_token'],
@@ -190,10 +197,14 @@ def add_handle(request):
                     for t in saved_tweets:
                         t.extract_hashtags()
 
-                    messages.success(request, "The handle {} was added!".format(handle))
+                    messages.success(request, "{}' were added successfully!".format(handle))
                 except TweepError as err:
+                    print(":::: ERROR:", err, err.response.status_code)
                     if err.response.status_code == 404:
                         messages.error(request, "The provided Twitter handle doesn't exist. Please check the spelling.")
+                    elif err.response.status_code == 401:
+                        messages.error(request, "{}'s timeline is protected, we can't fetch his/her "
+                                                "tweets.".format(handle))
                     else:
                         messages.error(request, "There was a problem in the request, please check the handle spelling "
                                                 "and try again.")
@@ -204,6 +215,8 @@ def add_handle(request):
 
     return HttpResponseRedirect(reverse("tweet_monitor:index"))
 
+
+# ################### FOR TESTING PURPOSES ONLY ################### #
 
 @login_required
 def filters(request):

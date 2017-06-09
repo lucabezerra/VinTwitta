@@ -8,7 +8,8 @@ app_name = "tweet_monitor"
 urlpatterns = [
     # React view
     url(r'^process_add_handle/$', views.add_handle, name='add_handle'),
-    url(r'^$', TemplateView.as_view(template_name='tweet_monitor/react_index.html'), name='index'),
+    # url(r'^$', TemplateView.as_view(template_name='tweet_monitor/react_index.html'), name='index'),
+    url(r'^$', views.index, name='index'),
 
     # Pure Django views
     # url(r'^/$', views.index, name='index2'),
